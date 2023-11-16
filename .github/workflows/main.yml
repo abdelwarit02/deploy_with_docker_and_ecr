@@ -3,7 +3,6 @@ name: Deploy to ECR
 on:
   push:
     branches: [master]
-    
 
 jobs:
   build:
@@ -19,16 +18,18 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t my_image .
+          docker build -t myimage .
       
       - name: Login to Amazon ECR
         id: login-ecr
         run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com
 
       - name: Tag Docker image
         run: |
-          docker tag my_image:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/myrepo:latest
+          docker tag myimage:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/myrepo:latest
 
       - name: Push Docker image to ECR
         run: |
